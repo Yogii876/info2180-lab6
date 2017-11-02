@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+	<input type="text" id="searchbox"/>
+	<button id="search">Search</button>
+	<button id="allxml">Get All XML</button>
+	<br>
+	<br>
+	<div id="result"></div>
+</body>
+	<script type="text/javascript">
+	
+		var $search = document.getElementById('search');
+		var $searchbox = document.getElementById('searchbox');
+		var $allxml = document.getElementById('allxml');
+		var definitions = ['definition', 'bar', 'html', 'css', 'javascript', 'php'];
+		
+		$search.addEventListener("click", function(){
+			var $result = document.getElementById('result');
+			var validWord = false;
+			definitions.forEach(function(element){
+				console.log(element);
+				if(element === $searchbox.value)
+				{
+					validWord = true;
+				}
+			});
+			if(validWord){
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', 'request.php?q=' + $searchbox.value);
+				xhr.onload = function() {
+    				if (xhr.status === 200) {
+        				$result.innerHTML =xhr.responseText;
+        			}
+    				else {
+        				alert(xhr.status);
+    				}
+				};
+				xhr.send();
+			}
+			else{
+				alert('Invalid Search');
+			}
+		});
+		
+		$allxml.addEventListener('click', function(){
+			var $result = document.getElementById('result');
+			var xhr = new XMLHttpRequest();
+			//xhr.open('GET', 'request.php?q=' + $searchbox.value);
+			xhr.open('GET', 'request.php?q=&all=true');
+			xhr.onload = function() {
+    			if (xhr.status === 200) {
+        			var xmlData =xhr.responseXML;
+        			var x = xmlData.getElementsByTagName("definition");
+        			var list;
+        			
+        			for (var i = 0; i <x.length; i++) { 
+						list += '<li>' + '<h3>' + x[i].getAttribute('name')+ '</h3></li>' + x[i].childNodes[0].nodeValue +'<br><br>'+ '- ' + x[i].getAttribute('author');
+					}
+					$result.innerHTML = '<ol>' + list + '</ol>';
+        		}
+    			else {
+        			alert(xhr.status);
+    			}
+			};
+			xhr.send();	
+		});
+		
+	</script>
+</html>
